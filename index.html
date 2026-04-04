@@ -300,6 +300,17 @@ select:focus { border-color: var(--primary); outline: none; }
   margin-bottom: 12px;
 }
 
+/* Question images */
+.q-images { margin-bottom: 16px; }
+.q-images img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  display: block;
+}
+
 /* Review list */
 .review-item {
   border-bottom: 1px solid var(--border);
@@ -407,6 +418,7 @@ select:focus { border-color: var(--primary); outline: none; }
       &#9888; この問題は図表を含むため、テキストだけでは解答できない場合があります。
     </div>
     <div class="q-text" id="q-text"></div>
+    <div class="q-images" id="q-images"></div>
     <div class="option-group" id="q-options"></div>
 
     <div class="feedback" id="feedback"></div>
@@ -602,12 +614,26 @@ select:focus { border-color: var(--primary); outline: none; }
     document.getElementById('q-meta').textContent =
       `${q.exam_year} ${q.subject} ${q.question_number}`;
 
-    // Image warning
+    // Image warning (only show if has_image but no image URLs available)
+    const hasUrls = q.image_urls && q.image_urls.length > 0;
     document.getElementById('image-warning').style.display =
-      q.has_image ? 'block' : 'none';
+      (q.has_image && !hasUrls) ? 'block' : 'none';
 
     // Question text
     document.getElementById('q-text').textContent = q.question_text;
+
+    // Question images
+    const imgContainer = document.getElementById('q-images');
+    imgContainer.innerHTML = '';
+    if (q.image_urls && q.image_urls.length > 0) {
+      q.image_urls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = '問題の図表';
+        img.loading = 'lazy';
+        imgContainer.appendChild(img);
+      });
+    }
 
     // Options
     const optContainer = document.getElementById('q-options');

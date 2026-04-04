@@ -154,6 +154,7 @@ class ExamPageParser(HTMLParser):
         self.current_row_cells = []
         self.questions = []
         self.has_image_in_current = False
+        self.current_image_urls = []
 
     def handle_starttag(self, tag, attrs):
         attrs_dict = dict(attrs)
@@ -205,6 +206,9 @@ class ExamPageParser(HTMLParser):
             self.current_row_cells.append("")
         elif tag == "img":
             self.has_image_in_current = True
+            src = attrs_dict.get("src", "")
+            if src and "siteguard" not in src:
+                self.current_image_urls.append(src)
         elif tag == "br":
             if self.in_question_p:
                 self.current_question_text += "\n"
@@ -275,6 +279,7 @@ class ExamPageParser(HTMLParser):
             self.current_question_text = ""
             self.current_options = []
             self.has_image_in_current = False
+            self.current_image_urls = []
             return
 
         # Extract question number (half-width or full-width)
@@ -304,10 +309,12 @@ class ExamPageParser(HTMLParser):
             "question_text": q_text,
             "options": clean_options,
             "has_image": self.has_image_in_current,
+            "image_urls": list(self.current_image_urls),
         })
         self.current_question_text = ""
         self.current_options = []
         self.has_image_in_current = False
+        self.current_image_urls = []
 
 
 def parse_exam_page(html):
@@ -365,7 +372,7 @@ def main():
             if q_num == all_correct_no:
                 answer = "全員正解"
 
-            all_questions.append({
+            entry = {
                 "exam_year": year_label,
                 "subject": subject,
                 "question_number": q["question_number"],
@@ -373,7 +380,10 @@ def main():
                 "options": q["options"],
                 "correct_answer": answer,
                 "has_image": q["has_image"],
-            })
+            }
+            if q.get("image_urls"):
+                entry["image_urls"] = q["image_urls"]
+            all_questions.append(entry)
 
         print(f"{len(questions)}問 (正解{len(answer_list)}件)")
         time.sleep(0.5)
