@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+hoikushi_exam_data.json
+.claude/
