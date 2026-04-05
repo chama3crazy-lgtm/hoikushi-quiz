@@ -98,9 +98,10 @@ def parse_answer_key(text):
 
 # --- 図の抽出（PyMuPDFベース） ---
 
-def extract_figure(pdf_path, page_idx, q_num, year_code):
+def extract_figure(pdf_path, page_idx, q_num, year_code, q_text_hint=""):
     """指定ページから問題番号の図をクロップしてPNGで保存する。
     PyMuPDFのテキストブロックで正確なY座標を取得してクロップ。
+    q_text_hint: 問題文の先頭部分（旧フォーマットのマーカー特定用）
     戻り値: 保存した画像ファイルのパス（失敗時None）"""
     os.makedirs(IMG_DIR, exist_ok=True)
     img_path = os.path.join(IMG_DIR, f"{year_code}_No{q_num:03d}.png")
@@ -118,7 +119,8 @@ def extract_figure(pdf_path, page_idx, q_num, year_code):
         blocks = sorted(page.get_text("blocks"), key=lambda b: b[1])
 
         # この問題番号のブロックとそのy1を探す
-        # "〔No ． 3  〕" のように空白が入る場合を考慮
+        # 新フォーマット: "〔No ． 3  〕"
+        # 旧フォーマット: "〔No 阿X〕" (Xは CID encoded number)
         q_marker_re = re.compile(rf"No\s*[．.]\s*{q_num}\s*(?:\s|[〕〕\]）])")
         q_block_y1 = None  # 問題マーカーブロックのy1
 
@@ -128,20 +130,52 @@ def extract_figure(pdf_path, page_idx, q_num, year_code):
                 q_block_y1 = b[3]
                 break
 
+        # 新フォーマットでマッチしなかった場合、旧フォーマット（〔No 阿）で探す
+        if q_block_y1 is None:
+            # 〔No 阿 を含むブロックを全て収集
+            no_markers = []
+            for b in blocks:
+                block_text = re.sub(r"\(cid:\d+\)", "", b[4])
+                if re.search(r"〔No\s*阿", block_text):
+                    no_markers.append(b)
+
+            if no_markers:
+                # q_text_hint で正しいマーカーを特定
+                # ヒントの最初の漢字数文字と一致するブロックを探す
+                hint_kanji = re.sub(r"[\u3040-\u309f\s]", "", q_text_hint)[:6]
+                matched = False
+                if hint_kanji:
+                    for b in no_markers:
+                        block_text = re.sub(r"\(cid:\d+\)", "", b[4])
+                        block_clean = re.sub(r"[\u3040-\u309f\s〔〕No阿]", "", block_text)
+                        if hint_kanji[:3] in block_clean:
+                            q_block_y1 = b[3]
+                            matched = True
+                            break
+
+                # ヒントでマッチしなければ、ページ上の問題マーカーの順序で推定
+                if not matched and len(no_markers) == 1:
+                    q_block_y1 = no_markers[0][3]
+                elif not matched and len(no_markers) >= 2:
+                    # ページ上に複数の問題がある場合、has_imageのものを探す
+                    # 最後のマーカーが通常は図を含む問題
+                    q_block_y1 = no_markers[-1][3]
+
         if q_block_y1 is None:
             doc.close()
             return None
 
-        # まず選択肢の開始y0を探す（問題マーカー以降で "1．" から始まるブロック）
+        # 選択肢の開始y0を探す（問題マーカー以降で "1．" or "1阿" から始まるブロック）
         opt_y0 = None
         for b in blocks:
             if b[1] < q_block_y1:
                 continue
             block_text = re.sub(r"\(cid:\d+\)", "", b[4]).strip()
-            if re.match(r"1\s*[．.]\s", block_text):
+            if re.match(r"1\s*[．.阿]\s", block_text):
                 opt_y0 = b[1]
                 break
-            if re.search(r"〔No\s*[．.]\s*[0-9]+\s*[〕〕\]]", block_text):
+            # 次の問題のマーカーに到達した場合
+            if re.search(r"〔No\s*[．.阿]", block_text) and b[1] > q_block_y1 + 10:
                 opt_y0 = b[1]
                 break
 
@@ -149,10 +183,8 @@ def extract_figure(pdf_path, page_idx, q_num, year_code):
             opt_y0 = page_rect.height * 0.85
 
         # 問題文の終端（図の開始）を探す
-        # 優先: 「どれか。」「正しいものはどれか」などで終わる行のy1
-        # それが見つからなければ: q_block_y1から近い範囲（50pt以内）の最後の意味あるブロック
         preamble_end_y1 = q_block_y1
-        preamble_end_re = re.compile(r"どれか[。\s]?$|正しいもの.*$|適当なもの.*$|誤っているもの.*$")
+        preamble_end_re = re.compile(r"どれか[。\s]?$|正しいもの.*$|適当なもの.*$|誤っているもの.*$|するものとする[。\s]*$")
 
         for b in blocks:
             if b[1] < q_block_y1:
@@ -166,9 +198,9 @@ def extract_figure(pdf_path, page_idx, q_num, year_code):
             # 質問文末尾パターン
             if preamble_end_re.search(block_text):
                 preamble_end_y1 = b[3]
-                break  # 見つかったら停止（これが質問文終端）
-            # q_block_y1から60pt以内ならまだ質問文
-            if b[1] - q_block_y1 < 60:
+                break
+            # q_block_y1から80pt以内ならまだ質問文（旧フォーマットはふりがなで長い）
+            if b[1] - q_block_y1 < 80:
                 preamble_end_y1 = b[3]
 
         fig_y0 = preamble_end_y1 + 3
@@ -200,9 +232,40 @@ def extract_figure(pdf_path, page_idx, q_num, year_code):
 
 # --- 問題パース ---
 
+def strip_furigana(text):
+    """テキストからふりがな（ルビ）を除去する。
+    PDFから抽出されたテキストでは、漢字のルビが空白区切りのひらがなとして混入する。
+    例: "変圧器 へんあつき の一次電流" → "変圧器の一次電流"
+        "か ず し か へんあつきおよ" → ""
+    """
+    # 1) スペースで区切られた単一ひらがな文字の連続を除去
+    #    例: "か ず し か" → "", "む し" → ""
+    text = re.sub(r"(?<= )(?:[\u3040-\u309f] ){1,}[\u3040-\u309f](?= |$)", "", text)
+    # 2) スペースで区切られたひらがなのみの単語（2文字以上、長さ制限なし）を除去
+    #    例: "へんあつきおよ" "ひゃくぶんりつていこうこうか"
+    text = re.sub(r"(?<= )[\u3040-\u309f]{2,}(?= |$)", "", text)
+    # 3) 文末のひらがなのみの語を除去
+    text = re.sub(r"\s+[\u3040-\u309f]{2,}\s*$", "", text)
+    # 4) 先頭のひらがなのみの語を除去
+    text = re.sub(r"^\s*[\u3040-\u309f]{2,}\s+", "", text)
+    # 5) 連続する空白を1つにまとめる
+    text = re.sub(r" {2,}", " ", text).strip()
+    return text
+
+
+def is_furigana_line(line):
+    """ひらがな・スペースのみの行（ふりがな行）かどうかを判定する"""
+    stripped = line.strip()
+    if not stripped:
+        return False
+    # ひらがな・スペースのみで構成される行はふりがな
+    cleaned = re.sub(r"[\u3040-\u309f\s]", "", stripped)
+    return len(cleaned) == 0
+
+
 def clean_block(text):
-    """テキストブロック内の余分な空白・改行を整理する"""
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    """テキストブロック内の余分な空白・改行を整理する。ふりがな行を除去する"""
+    lines = [l.strip() for l in text.split("\n") if l.strip() and not is_furigana_line(l)]
     return " ".join(lines)
 
 
@@ -313,8 +376,8 @@ def _parse_old_format(combined, page_starts, get_page_for_pos, gogo_page,
             re.DOTALL,
         ):
             opt_text = clean_block(opt_m.group(1))
-            # ひらがなのみの単語（ふりがな）を末尾から除去
-            opt_text = re.sub(r"\s+[\u3040-\u309f\s]+$", "", opt_text)
+            # ふりがな除去
+            opt_text = strip_furigana(opt_text)
             opt_text = re.sub(r"\s+", " ", opt_text).strip()
             if opt_text:
                 options.append(opt_text)
@@ -326,8 +389,8 @@ def _parse_old_format(combined, page_starts, get_page_for_pos, gogo_page,
         q_text = clean_block(q_text_raw)
         # 旧フォーマットでは "亜" が読点に相当する場合があるため置換
         q_text = q_text.replace("亜", "、")
-        # ひらがなのみの単語（ふりがな: スペースで区切られた2-5文字のひらがな）を除去
-        q_text = re.sub(r"(?<= )[\u3040-\u309f]{2,6}(?= |$)", "", q_text)
+        # ふりがな除去
+        q_text = strip_furigana(q_text)
         q_text = re.sub(r"\s+", " ", q_text).strip()
         # 先頭の〔No..〕残滓のみを除去（単位〔m〕等は除去しない）
         q_text = re.sub(r"^〔?No[^\]〕]{0,15}[〕\]]\s*", "", q_text).strip()
@@ -356,7 +419,8 @@ def _parse_old_format(combined, page_starts, get_page_for_pos, gogo_page,
     print("  図を抽出中...")
     for entry, page_idx, q_num in questions:
         if entry["has_image"]:
-            img_path = extract_figure(pdf_path, page_idx, q_num, year_code)
+            img_path = extract_figure(pdf_path, page_idx, q_num, year_code,
+                                      q_text_hint=entry["question_text"])
             if img_path:
                 entry["image_file"] = img_path
                 print(f"    No.{q_num} → {img_path}")
@@ -433,7 +497,8 @@ def _parse_new_format(combined, page_starts, get_page_for_pos, gogo_page,
     print("  図を抽出中...")
     for entry, page_idx, q_num in questions:
         if entry["has_image"]:
-            img_path = extract_figure(pdf_path, page_idx, q_num, year_code)
+            img_path = extract_figure(pdf_path, page_idx, q_num, year_code,
+                                      q_text_hint=entry["question_text"])
             if img_path:
                 entry["image_file"] = img_path
                 print(f"    No.{q_num} → {img_path}")
