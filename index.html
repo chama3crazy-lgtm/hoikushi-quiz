@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>保育士試験 過去問トレーニング</title>
+<title>1級電気工事施工管理技士 過去問トレーニング</title>
 <style>
 :root {
-  --primary: #4a90d9;
-  --primary-dark: #3a7bc8;
+  --primary: #1a5276;
+  --primary-dark: #154360;
+  --accent: #f0b429;
   --correct: #27ae60;
   --wrong: #e74c3c;
-  --bg: #f5f7fa;
+  --bg: #eaf0f6;
   --card: #ffffff;
-  --text: #2c3e50;
+  --text: #1c2833;
   --text-light: #7f8c8d;
-  --border: #dde1e6;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --border: #d5d8dc;
+  --shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,7 +30,7 @@ body {
 }
 
 .container {
-  max-width: 720px;
+  max-width: 740px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -38,15 +39,16 @@ body {
 header {
   background: var(--primary);
   color: white;
-  padding: 16px 0;
+  padding: 14px 0;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.20);
 }
-header h1 { font-size: 1.1rem; font-weight: 600; }
-header .sub { font-size: 0.8rem; opacity: 0.85; margin-top: 2px; }
+header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
+header .sub { font-size: 0.78rem; opacity: 0.80; margin-top: 3px; }
+header .accent { color: var(--accent); }
 
 /* Screen management */
 .screen { display: none; }
@@ -61,7 +63,7 @@ header .sub { font-size: 0.8rem; opacity: 0.85; margin-top: 2px; }
   box-shadow: var(--shadow);
 }
 .card h2 {
-  font-size: 1rem;
+  font-size: 0.95rem;
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--primary);
@@ -103,10 +105,7 @@ select:focus { border-color: var(--primary); outline: none; }
   width: 100%;
 }
 .btn-primary:hover { background: var(--primary-dark); }
-.btn-primary:disabled {
-  background: #b0c4de;
-  cursor: not-allowed;
-}
+.btn-primary:disabled { background: #b0c4de; cursor: not-allowed; }
 .btn-secondary {
   background: #ecf0f1;
   color: var(--text);
@@ -114,14 +113,129 @@ select:focus { border-color: var(--primary); outline: none; }
   width: 100%;
 }
 .btn-secondary:hover { background: #dde1e6; }
-.btn-small {
-  padding: 8px 16px;
-  font-size: 0.85rem;
-}
-.btn-correct { background: var(--correct); color: white; }
-.btn-wrong { background: var(--wrong); color: white; }
+.btn-small { padding: 8px 16px; font-size: 0.85rem; }
 
-/* Checkbox & Radio options */
+/* Chips */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1.5px solid var(--border);
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Mode grid */
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mode-card {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-card:hover { border-color: var(--primary); }
+.mode-card.selected { border-color: var(--primary); background: #d4e6f1; }
+.mode-icon { font-size: 1.8rem; margin-bottom: 4px; }
+.mode-name { font-weight: 600; font-size: 0.9rem; }
+.mode-desc { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+
+/* Number input */
+.num-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.num-input-group input {
+  width: 80px;
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+}
+.num-input-group input:focus { border-color: var(--primary); outline: none; }
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #d5d8dc;
+  border-radius: 3px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* Question info */
+.q-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+.q-number {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary);
+}
+.q-meta { font-size: 0.78rem; }
+
+.q-text {
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.85;
+}
+
+/* Image warning */
+.image-warning {
+  background: #fef9e7;
+  color: #9a7d0a;
+  border: 1px solid #f9ca24;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+/* Question images */
+.q-images { margin-bottom: 16px; }
+.q-images img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  display: block;
+  background: #fafafa;
+}
+
+/* Options */
 .option-group { margin: 12px 0; }
 .option-item {
   display: block;
@@ -134,59 +248,27 @@ select:focus { border-color: var(--primary); outline: none; }
   user-select: none;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.93rem;
 }
-.option-item:hover { border-color: var(--primary); background: #f0f6ff; }
-.option-item.selected { border-color: var(--primary); background: #e3eeff; }
+.option-item:hover { border-color: var(--primary); background: #d4e6f1; }
+.option-item.selected { border-color: var(--primary); background: #d4e6f1; }
 .option-item.correct-answer { border-color: var(--correct); background: #e8f8f0; }
 .option-item.wrong-answer { border-color: var(--wrong); background: #fde8e8; }
 .option-item.disabled { pointer-events: none; }
+.option-item input[type="radio"] { margin-right: 8px; vertical-align: middle; }
 
-.option-item input[type="radio"],
-.option-item input[type="checkbox"] {
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-/* Progress bar */
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: #ecf0f1;
-  border-radius: 3px;
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-
-/* Question info */
-.q-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin-bottom: 8px;
-}
-.q-number {
+/* Option label */
+.opt-num {
+  display: inline-block;
+  width: 1.6em;
   font-weight: 700;
-  font-size: 1rem;
   color: var(--primary);
 }
+.option-item.selected .opt-num,
+.option-item.correct-answer .opt-num,
+.option-item.wrong-answer .opt-num { color: inherit; }
 
-.q-text {
-  font-size: 0.95rem;
-  margin-bottom: 16px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.8;
-}
-
-/* Result feedback */
+/* Feedback */
 .feedback {
   padding: 12px 16px;
   border-radius: 8px;
@@ -198,21 +280,17 @@ select:focus { border-color: var(--primary); outline: none; }
 .feedback.correct { background: #e8f8f0; color: var(--correct); }
 .feedback.wrong { background: #fde8e8; color: var(--wrong); }
 
-/* Score display */
+/* Score */
 .score-display {
   text-align: center;
   padding: 20px;
 }
-.score-number {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--primary);
-}
+.score-number { font-size: 3rem; font-weight: 700; color: var(--primary); }
 .score-detail { color: var(--text-light); margin-top: 4px; }
 .score-bar {
   width: 100%;
   height: 12px;
-  background: #ecf0f1;
+  background: #d5d8dc;
   border-radius: 6px;
   margin: 16px 0;
   overflow: hidden;
@@ -239,112 +317,33 @@ select:focus { border-color: var(--primary); outline: none; }
 .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
 .stat-label { font-size: 0.75rem; color: var(--text-light); }
 
-/* Filter chips */
-.chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.chip {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  border: 1px solid var(--border);
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-/* Mode selection */
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.mode-card {
-  background: var(--bg);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.mode-card:hover { border-color: var(--primary); }
-.mode-card.selected { border-color: var(--primary); background: #e3eeff; }
-.mode-icon { font-size: 2rem; margin-bottom: 4px; }
-.mode-name { font-weight: 600; font-size: 0.9rem; }
-.mode-desc { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
-
-/* Question count badge */
-.q-count-badge {
-  display: inline-block;
-  background: var(--primary);
-  color: white;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  margin-left: 8px;
-}
-
-/* Image warning */
-.image-warning {
-  background: #fff3cd;
-  color: #856404;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin-bottom: 12px;
-}
-
-/* Question images */
-.q-images { margin-bottom: 16px; }
-.q-images img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  margin-bottom: 8px;
-  display: block;
-}
-
 /* Review list */
 .review-item {
   border-bottom: 1px solid var(--border);
   padding: 12px 0;
 }
 .review-item:last-child { border-bottom: none; }
-.review-q { font-weight: 600; margin-bottom: 4px; }
-.review-answer { font-size: 0.85rem; }
-.review-your { color: var(--wrong); }
-.review-correct { color: var(--correct); }
+.review-q { font-weight: 600; margin-bottom: 4px; font-size: 0.9rem; }
+.review-correct { color: var(--correct); font-size: 0.85rem; }
 
-/* Number input */
-.num-input-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+/* Section badge */
+.section-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #7d5a00;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 6px;
 }
-.num-input-group input {
-  width: 80px;
-  padding: 8px 12px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  font-size: 1rem;
-  text-align: center;
-}
-.num-input-group input:focus { border-color: var(--primary); outline: none; }
 
 /* Responsive */
 @media (max-width: 480px) {
   .container { padding: 12px; }
   .card { padding: 16px; }
   .q-text { font-size: 0.9rem; }
-  .option-item { padding: 10px 12px; font-size: 0.9rem; }
+  .option-item { padding: 10px 12px; font-size: 0.88rem; }
   .mode-grid { grid-template-columns: 1fr; }
 }
 </style>
@@ -352,8 +351,8 @@ select:focus { border-color: var(--primary); outline: none; }
 <body>
 
 <header>
-  <h1>保育士試験 過去問トレーニング</h1>
-  <div class="sub">令和3年～令和7年 全1600問</div>
+  <h1>&#9889; <span class="accent">1級</span>電気工事施工管理技士 過去問トレーニング</h1>
+  <div class="sub">令和3年〜令和7年 全<span id="total-count">—</span>問</div>
 </header>
 
 <!-- ====== 設定画面 ====== -->
@@ -366,8 +365,8 @@ select:focus { border-color: var(--primary); outline: none; }
   </div>
 
   <div class="card">
-    <h2>科目を選択</h2>
-    <div id="subject-chips" class="chip-group"></div>
+    <h2>区分を選択</h2>
+    <div id="section-chips" class="chip-group"></div>
   </div>
 
   <div class="card">
@@ -376,7 +375,7 @@ select:focus { border-color: var(--primary); outline: none; }
       <div class="mode-card selected" data-mode="sequential">
         <div class="mode-icon">&#128220;</div>
         <div class="mode-name">順番通り</div>
-        <div class="mode-desc">問1から順に出題</div>
+        <div class="mode-desc">No.1から順に出題</div>
       </div>
       <div class="mode-card" data-mode="random">
         <div class="mode-icon">&#127922;</div>
@@ -391,10 +390,10 @@ select:focus { border-color: var(--primary); outline: none; }
     <div class="num-input-group">
       <input type="number" id="q-limit" min="1" value="20">
       <span>問</span>
-      <span style="font-size:0.8rem;color:var(--text-light)">（対象: <span id="q-available">0</span>問）</span>
+      <span style="font-size:0.82rem;color:var(--text-light)">（対象: <span id="q-available">0</span>問）</span>
     </div>
     <label style="font-size:0.85rem;display:flex;align-items:center;gap:6px;">
-      <input type="checkbox" id="skip-image"> 画像問題をスキップする
+      <input type="checkbox" id="skip-image"> 図表問題をスキップする
     </label>
   </div>
 
@@ -412,10 +411,10 @@ select:focus { border-color: var(--primary); outline: none; }
   <div class="card">
     <div class="q-info">
       <span class="q-number" id="q-label"></span>
-      <span id="q-meta"></span>
+      <span class="q-meta" id="q-meta"></span>
     </div>
     <div id="image-warning" class="image-warning" style="display:none;">
-      &#9888; この問題は図表を含むため、テキストだけでは解答できない場合があります。
+      &#9888; この問題は図表を含む可能性があります（図は参考書等でご確認ください）。
     </div>
     <div class="q-text" id="q-text"></div>
     <div class="q-images" id="q-images"></div>
@@ -465,28 +464,30 @@ select:focus { border-color: var(--primary); outline: none; }
 </div>
 </div>
 
-<script src="data.js?v=2"></script>
+<script src="data.js?v=1"></script>
 <script>
 (function() {
   'use strict';
 
   // --- State ---
   let selectedYears = new Set();
-  let selectedSubjects = new Set();
+  let selectedSections = new Set();
   let quizMode = 'sequential';
   let currentQuiz = [];
   let currentIndex = 0;
-  let results = []; // {question, userAnswer, isCorrect}
+  let results = [];
   let answered = false;
 
   // --- Data helpers ---
-  const years = [...new Set(EXAM_DATA.map(q => q.exam_year))];
-  const subjects = [...new Set(EXAM_DATA.map(q => q.subject))];
+  const years = [...new Set(EXAM_DATA.map(q => q.exam_year))].sort();
+  const sections = [...new Set(EXAM_DATA.map(q => q.section))];
+
+  document.getElementById('total-count').textContent = EXAM_DATA.length;
 
   function getFilteredQuestions() {
     return EXAM_DATA.filter(q => {
       if (selectedYears.size > 0 && !selectedYears.has(q.exam_year)) return false;
-      if (selectedSubjects.size > 0 && !selectedSubjects.has(q.subject)) return false;
+      if (selectedSections.size > 0 && !selectedSections.has(q.section)) return false;
       if (document.getElementById('skip-image').checked && q.has_image) return false;
       return true;
     });
@@ -499,34 +500,6 @@ select:focus { border-color: var(--primary); outline: none; }
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
-  }
-
-  // --- Parse options: separate header row from actual choices ---
-  function parseOptions(options) {
-    const header = [];
-    const choices = [];
-    options.forEach(opt => {
-      const cleaned = opt.replace(/\t/g, '  ');
-      // Header rows don't start with a digit (e.g. "A  B  C  D", "Ａ  Ｂ  Ｃ  Ｄ")
-      if (/^\s*\d/.test(cleaned)) {
-        choices.push(cleaned);
-      } else {
-        header.push(cleaned);
-      }
-    });
-    return { header, choices };
-  }
-
-  // Check if question requires multiple answers
-  function isMultiAnswer(q) {
-    if (!q.correct_answer) return false;
-    return q.correct_answer.includes(',');
-  }
-
-  // Parse correct answer into array of option indices
-  function getCorrectIndices(q) {
-    if (!q.correct_answer) return [];
-    return q.correct_answer.split(',').map(s => s.trim());
   }
 
   // --- UI: Setup chips ---
@@ -545,18 +518,18 @@ select:focus { border-color: var(--primary); outline: none; }
       yearContainer.appendChild(chip);
     });
 
-    const subContainer = document.getElementById('subject-chips');
-    subjects.forEach(s => {
+    const secContainer = document.getElementById('section-chips');
+    sections.forEach(s => {
       const chip = document.createElement('div');
       chip.className = 'chip';
       chip.textContent = s;
       chip.addEventListener('click', () => {
         chip.classList.toggle('active');
-        if (chip.classList.contains('active')) selectedSubjects.add(s);
-        else selectedSubjects.delete(s);
+        if (chip.classList.contains('active')) selectedSections.add(s);
+        else selectedSections.delete(s);
         updateAvailable();
       });
-      subContainer.appendChild(chip);
+      secContainer.appendChild(chip);
     });
   }
 
@@ -602,7 +575,6 @@ select:focus { border-color: var(--primary); outline: none; }
 
     answered = false;
     const q = currentQuiz[currentIndex];
-    const multi = isMultiAnswer(q);
 
     // Progress
     document.getElementById('progress-fill').style.width =
@@ -612,65 +584,53 @@ select:focus { border-color: var(--primary); outline: none; }
     document.getElementById('q-label').textContent =
       `${currentIndex + 1} / ${currentQuiz.length}`;
     document.getElementById('q-meta').textContent =
-      `${q.exam_year} ${q.subject} ${q.question_number}`;
+      `${q.exam_year} ${q.section} ${q.question_number}`;
 
-    // Image warning (only show if has_image but no image URLs available)
-    const hasUrls = q.image_urls && q.image_urls.length > 0;
+    // Image handling
+    const hasImg = q.image_file;
+    const hasFlag = q.has_image;
     document.getElementById('image-warning').style.display =
-      (q.has_image && !hasUrls) ? 'block' : 'none';
+      (hasFlag && !hasImg) ? 'block' : 'none';
 
     // Question text
     document.getElementById('q-text').textContent = q.question_text;
 
-    // Question images
+    // Images
     const imgContainer = document.getElementById('q-images');
     imgContainer.innerHTML = '';
-    if (q.image_urls && q.image_urls.length > 0) {
-      q.image_urls.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = '問題の図表';
-        img.loading = 'lazy';
-        imgContainer.appendChild(img);
-      });
+    if (hasImg) {
+      const img = document.createElement('img');
+      img.src = q.image_file;
+      img.alt = '問題の図表';
+      img.loading = 'lazy';
+      imgContainer.appendChild(img);
     }
 
     // Options
     const optContainer = document.getElementById('q-options');
     optContainer.innerHTML = '';
-
-    const { header, choices } = parseOptions(q.options);
-
-    // Show header row as non-selectable label if present
-    if (header.length > 0) {
-      const headerDiv = document.createElement('div');
-      headerDiv.style.cssText = 'padding:8px 16px;font-size:0.85rem;color:var(--text-light);font-weight:600;white-space:pre-wrap;';
-      headerDiv.textContent = header.join('\n');
-      optContainer.appendChild(headerDiv);
-    }
-
-    choices.forEach((opt, i) => {
+    q.options.forEach((opt, i) => {
       const label = document.createElement('label');
       label.className = 'option-item';
 
       const input = document.createElement('input');
-      input.type = multi ? 'checkbox' : 'radio';
+      input.type = 'radio';
       input.name = 'q-option';
       input.value = i;
 
+      const numSpan = document.createElement('span');
+      numSpan.className = 'opt-num';
+      numSpan.textContent = (i + 1) + '.';
+
       label.appendChild(input);
-      label.appendChild(document.createTextNode(opt));
-      label.addEventListener('click', (e) => {
+      label.appendChild(numSpan);
+      label.appendChild(document.createTextNode(' ' + opt));
+
+      label.addEventListener('click', () => {
         if (answered) return;
-        if (!multi) {
-          optContainer.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
-        }
-        // Toggle for checkbox
-        if (multi && e.target !== input) {
-          input.checked = !input.checked;
-          e.preventDefault();
-        }
-        label.classList.toggle('selected', input.checked || (!multi));
+        optContainer.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+        label.classList.add('selected');
+        input.checked = true;
       });
 
       optContainer.appendChild(label);
@@ -686,66 +646,46 @@ select:focus { border-color: var(--primary); outline: none; }
     if (answered) return;
 
     const q = currentQuiz[currentIndex];
-    const multi = isMultiAnswer(q);
     const optContainer = document.getElementById('q-options');
     const inputs = optContainer.querySelectorAll('input');
     const items = optContainer.querySelectorAll('.option-item');
 
-    // Get user selection
-    let userSelected = [];
-    inputs.forEach((inp, i) => {
-      if (inp.checked) userSelected.push(i);
-    });
-
-    if (userSelected.length === 0) return; // Nothing selected
+    let userSelected = -1;
+    inputs.forEach((inp, i) => { if (inp.checked) userSelected = i; });
+    if (userSelected < 0) return;
 
     answered = true;
 
-    // Get correct answer indices (match option text starting with the number)
-    const correctNums = getCorrectIndices(q);
-    const { choices } = parseOptions(q.options);
-    const correctIndices = [];
-    choices.forEach((opt, i) => {
-      const optNum = opt.trim().match(/^(\d+)/);
-      if (optNum && correctNums.includes(optNum[1])) {
-        correctIndices.push(i);
-      }
-    });
+    // Correct answer index (1-based string → 0-based index)
+    const correctNum = parseInt(q.correct_answer);
+    const correctIdx = isNaN(correctNum) ? -1 : correctNum - 1;
 
-    // Check correctness
-    const isCorrect = correctIndices.length === userSelected.length &&
-      correctIndices.every(ci => userSelected.includes(ci));
+    const isCorrect = (userSelected === correctIdx);
 
-    // Visual feedback on options
+    // Visual feedback
     items.forEach((item, i) => {
       item.classList.add('disabled');
-      if (correctIndices.includes(i)) {
-        item.classList.add('correct-answer');
-      }
-      if (userSelected.includes(i) && !correctIndices.includes(i)) {
-        item.classList.add('wrong-answer');
-      }
+      if (i === correctIdx) item.classList.add('correct-answer');
+      if (i === userSelected && i !== correctIdx) item.classList.add('wrong-answer');
     });
 
-    // Feedback text
     const feedback = document.getElementById('feedback');
     feedback.classList.add('show');
     if (isCorrect) {
       feedback.classList.add('correct');
-      feedback.textContent = '\u2713 正解!';
+      feedback.textContent = '\u2713 正解！';
     } else {
       feedback.classList.add('wrong');
-      feedback.textContent = '\u2717 不正解 - 正解: ' + q.correct_answer;
+      const correctLabel = correctIdx >= 0 ? (correctIdx + 1) : q.correct_answer;
+      feedback.textContent = '\u2717 不正解 — 正解: ' + correctLabel;
     }
 
-    // Save result
     results.push({
       question: q,
-      userAnswer: userSelected.map(i => choices[i]).join(', '),
+      userAnswer: userSelected + 1,
       isCorrect
     });
 
-    // Buttons
     document.getElementById('btn-answer').style.display = 'none';
     document.getElementById('btn-next').style.display = 'block';
   }
@@ -764,20 +704,15 @@ select:focus { border-color: var(--primary); outline: none; }
     const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
 
     document.getElementById('result-score').textContent = pct + '%';
-    document.getElementById('result-detail').textContent =
-      `${total}問中 ${correct}問正解`;
-
+    document.getElementById('result-detail').textContent = `${total}問中 ${correct}問正解`;
     document.getElementById('stat-correct').textContent = correct;
     document.getElementById('stat-wrong').textContent = total - correct;
 
     const barFill = document.getElementById('score-bar-fill');
     barFill.style.width = '0%';
     barFill.style.background = pct >= 60 ? 'var(--correct)' : 'var(--wrong)';
-    requestAnimationFrame(() => {
-      barFill.style.width = pct + '%';
-    });
+    requestAnimationFrame(() => { barFill.style.width = pct + '%'; });
 
-    // Wrong answers review
     const wrongResults = results.filter(r => !r.isCorrect);
     const reviewCard = document.getElementById('review-card');
     const reviewList = document.getElementById('review-list');
@@ -788,12 +723,11 @@ select:focus { border-color: var(--primary); outline: none; }
       wrongResults.forEach(r => {
         const div = document.createElement('div');
         div.className = 'review-item';
+        const preview = r.question.question_text.substring(0, 80).replace(/\s+/g, ' ');
         div.innerHTML = `
-          <div class="review-q">${r.question.exam_year} ${r.question.subject} ${r.question.question_number}</div>
-          <div class="review-answer">
-            <div style="font-size:0.85rem;margin-bottom:4px;white-space:pre-wrap;">${escapeHtml(r.question.question_text.substring(0, 100))}...</div>
-            <div class="review-correct">\u2713 正解: ${r.question.correct_answer}</div>
-          </div>
+          <div class="review-q">${escapeHtml(r.question.exam_year)} ${escapeHtml(r.question.section)} ${escapeHtml(r.question.question_number)}</div>
+          <div style="font-size:0.83rem;margin-bottom:4px;color:var(--text-light)">${escapeHtml(preview)}…</div>
+          <div class="review-correct">&#10003; 正解: ${escapeHtml(r.question.correct_answer)}</div>
         `;
         reviewList.appendChild(div);
       });
@@ -803,7 +737,7 @@ select:focus { border-color: var(--primary); outline: none; }
   }
 
   function escapeHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   // --- Screen management ---

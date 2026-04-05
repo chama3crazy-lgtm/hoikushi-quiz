@@ -1,5 +1,4 @@
-// 1級電気工事施工管理技士 過去問データ
-const EXAM_DATA = [
+[
   {
     "exam_year": "令和3年度",
     "section": "午前の部",
@@ -6832,4 +6831,4 @@ const EXAM_DATA = [
     "has_image": false,
     "image_file": null
   }
-];
+]
